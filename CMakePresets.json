@@ -1,0 +1,35 @@
+{
+    "version": 6,
+    "configurePresets": [
+        {
+            "name": "debug-w64devkit",
+            "displayName": "Debug",
+            "generator": "MinGW Makefiles",
+            "binaryDir": "build/debug",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release",
+                "CMAKE_C_COMPILER": "C:/w64devkit/bin/gcc.exe",
+                "CMAKE_CXX_COMPILER": "C:/w64devkit/bin/g++.exe",
+                "CMAKE_MAKE_PROGRAM": "C:/w64devkit/bin/make.exe",
+                "CMAKE_SH": "CMAKE_SH-NOTFOUND"
+            }
+        },
+        {
+            "name": "release-w64devkit",
+            "displayName": "Release",
+            "generator": "MinGW Makefiles",
+            "binaryDir": "build/release",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug",
+                "CMAKE_C_COMPILER": "C:/w64devkit/bin/gcc.exe",
+                "CMAKE_CXX_COMPILER": "C:/w64devkit/bin/g++.exe",
+                "CMAKE_MAKE_PROGRAM": "C:/w64devkit/bin/make.exe",
+                "CMAKE_SH": "CMAKE_SH-NOTFOUND"
+            }
+        }
+    ],
+    "buildPresets": [
+        { "name": "debug", "configurePreset": "debug-w64devkit", "jobs": 0 },
+        { "name": "release", "configurePreset": "release-w64devkit", "jobs": 0 }
+    ]
+}
