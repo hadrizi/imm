@@ -2,11 +2,11 @@
 #define CORE_H
 
 #if defined(_WIN32) && defined(BUILD_LIBTYPE_SHARED)
-    #define CORE __declspec(dllexport) // We are building core as a Win32 shared library (.dll)
+    #define CORE __declspec(dllexport) // building core as a Win32 shared library (.dll)
 #elif defined(_WIN32) && defined(USE_CORE_LIB_SHARED)
-    #define CORE __declspec(dllimport) // We are using core as a Win32 shared library (.dll)
+    #define CORE __declspec(dllimport) // using core as a Win32 shared library (.dll)
 #else
-    #define CORE // We are building or using core as a static library
+    #define CORE // building or using core as a static library
 #endif
 
 #include "raylib.h"

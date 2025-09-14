@@ -43,7 +43,6 @@ target_link_libraries(game PUBLIC raylib swiss_lib)
 # =========================================
 
 # MISC ====================================
-# MinGW specifics (explicit system libs)
 if (MINGW)
   target_link_libraries(game PRIVATE winmm gdi32 opengl32 shlwapi)
   
@@ -57,7 +56,7 @@ if (NOT MSVC)
 endif()
 
 if (WIN32)
-  # Swap libcore.dll atomically using the built plugin (libcore_build.dll / core_build.dll)
+  # swap libcore_build with libcore but only after its BUILT so hot reload won't use unfinished dll
   add_custom_command(TARGET core POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E make_directory $<TARGET_FILE_DIR:game>
     COMMAND ${CMAKE_COMMAND} -E copy
@@ -66,10 +65,9 @@ if (WIN32)
     COMMAND ${CMAKE_COMMAND} -E rename
       $<TARGET_FILE_DIR:game>/libcore.dll.tmp
       $<TARGET_FILE_DIR:game>/libcore.dll
-    # optional: remove the build artifact if you don’t want it lying around
     COMMAND ${CMAKE_COMMAND} -E remove -f $<TARGET_FILE:core>
   )
-  # Ensure the single shared raylib is next to the EXE (both game and core use this one)
+
   add_custom_command(TARGET game POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_if_different
       $<TARGET_FILE:raylib>
