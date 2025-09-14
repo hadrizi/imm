@@ -14,6 +14,8 @@
         OK = 0,
         FAILED_TO_GET_MODULE_FILENAME,
         FAILED_TO_GET_FILE_ATTRIBUTES,
+        FAILED_TO_TRIM_PATH,
+        FAILED_TO_APPEND_PATH,
         FAILED_TO_COPY_LIBCORE,
         FAILED_TO_LOAD_LIBCORE,
         FAILED_TO_UNLOAD_LIBCORE,
@@ -24,9 +26,10 @@
 
     typedef struct {
         HINSTANCE dll_handle;
-        FILETIME  src_write_time;  // last write time of libcore.dll
+        FILETIME  src_write_time;  // last write time of libcore.dll, NOT COPY
 
         // core function pointers
+        // TODO: add type aliases to core.h and use them
         i64  (*prepare)();
         void (*create_window)();
         void (*loop)();
@@ -34,10 +37,18 @@
         void (*close_window)();
     } LibCoreAPI;
 
-    static void get_absolute_path(lstring rel_path, string absoulute_path) {
+    static BOOL get_absolute_path(lstring rel_path, string absoulute_path) {
         GetModuleFileNameA(NULL, absoulute_path, MAX_PATH);
-        PathRemoveFileSpecA(absoulute_path);
-        PathAppendA(absoulute_path, rel_path);
+        if (!PathRemoveFileSpecA(absoulute_path)) {
+            error_code = FAILED_TO_TRIM_PATH;
+            return FALSE;
+        }
+        if (!PathAppendA(absoulute_path, rel_path)) {
+            error_code = FAILED_TO_APPEND_PATH;
+            return FALSE;
+        }
+
+        return TRUE;
     }
 
     static BOOL copy_to_unique(lstring src, string dst_out, size_t dst_cap) {
@@ -52,14 +63,12 @@
         // strip filename
         for (int i = (int)len - 1; i >= 0 && tmp[i] != '\\' && tmp[i] != '/'; --i) tmp[i] = '\0';
         
-        // libcore_<N>.dll
         snprintf(tmp + strlen(tmp), MAX_PATH - strlen(tmp), "libcore_%u.dll", ++counter);
         if (dst_out && dst_cap) strncpy(dst_out, tmp, dst_cap);
         
         char absoulute_src[MAX_PATH];
-        get_absolute_path(src, absoulute_src);
+        if (!get_absolute_path(src, absoulute_src)) return FALSE;
         
-        // overwrite allowed (OK for rotating copies)
         if (!CopyFileA(absoulute_src, tmp, FALSE)) {
             error_code = FAILED_TO_COPY_LIBCORE;
             swiss_log_error("%s <- %s", absoulute_src, tmp);
@@ -72,7 +81,7 @@
 
     static BOOL get_file_time(lstring path, FILETIME* t) {
         char absoulute_path[MAX_PATH];
-        get_absolute_path(path, absoulute_path);
+        if (!get_absolute_path(path, absoulute_path)) return FALSE;
 
         WIN32_FILE_ATTRIBUTE_DATA fad;
         if (!GetFileAttributesExA(absoulute_path, GetFileExInfoStandard, &fad)) {
@@ -94,13 +103,12 @@
             return FALSE;
         };
 
-        // resolve symbols
         api->prepare             = (void*)GetProcAddress(dll_handle, "core_prepare");
         api->create_window       = (void*)GetProcAddress(dll_handle, "core_create_window");
         api->loop                = (void*)GetProcAddress(dll_handle, "core_loop");
         api->window_should_close = (void*)GetProcAddress(dll_handle, "core_window_should_close");
         api->close_window        = (void*)GetProcAddress(dll_handle, "core_close_window");
-
+        
         if (
             !api->prepare ||
             !api->create_window ||
@@ -199,6 +207,12 @@
                 (void*)core_api->window_should_close,
                 (void*)core_api->close_window
             );
+            break;
+        case FAILED_TO_TRIM_PATH:
+            swiss_log_error("failed to trim path");
+            break;
+        case FAILED_TO_APPEND_PATH:
+            swiss_log_error("failed to append path");
             break;
         default:
             break; // OK
