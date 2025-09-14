@@ -243,6 +243,9 @@ int main(void) {
             core_api.loop();
 
             if (reload_if_changed(&core_api, src_dll)) {
+                // TODO: currenly the state of the game is RESET when dll is reloaded
+                //       this is not good since we need to KEEP the state between reloads
+                //       should implement core_get_state and core_set_state in order to transfer it
                 if (core_api.prepare() != 0) {
                     swiss_log_error("failed to prepare game");
                     exit(1);
