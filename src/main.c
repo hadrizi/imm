@@ -1,4 +1,5 @@
 #define SWISS_IMPL
+#include "swiss.h"
 
 #if defined(USE_CORE_LIB_SHARED) 
     #include <windef.h>
@@ -8,7 +9,6 @@
     #include <libloaderapi.h>
     #include <fileapi.h>
     #include <stdio.h>
-    #include "swiss.h"
 
     typedef enum {
         OK = 0,
