@@ -1,0 +1,5 @@
+[render]
+width = 1600
+height = 900
+fov = 100.0
+target_fps = 120

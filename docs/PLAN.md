@@ -14,7 +14,7 @@ imm/
     models/ (OBJ for static, IQM for animated)
     textures/
     audio/
-    levels/ (JSON/CSG data)
+    levels/ (TOML/CSG data)
     scripts/
   src/
     main.c
@@ -36,7 +36,7 @@ imm/
 
 # Milestones
 **M0 — Bootstrap**
-- Build raylib window, basic frame loop, hot-reload config JSON
+- Build raylib window, basic frame loop, hot-reload config TOML
 - Flycam + simple level from boxes
 
 **M1 — ECS & Entities**
@@ -72,9 +72,9 @@ imm/
 ---
 
 # Data Formats
-- **Levels**: JSON (list of brushes/props/links) → bake collision/grid
+- **Levels**: TOML (list of brushes/props/links) → bake collision/grid
 - **Models**: OBJ for static, IQM for rigged (raylib-friendly)
-- **Materials**: JSON referencing texture sets
+- **Materials**: TOML referencing texture sets
 - **Scripts**: Lua files per entity/interaction
 
 ---
