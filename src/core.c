@@ -9,14 +9,14 @@
 
 typedef struct BoxDef { Vector3 pos, size; Color color; } BoxDef;
 
-static const BoxDef levelBoxes[] = {
-    {{ 0, 1.0f,  0}, { 1, 1, 1},       RED},       // center block (low)
+static const BoxDef level_boxes[] = {
+    {{ 0, 1.0f,  0}, { 1, 1, 1},        RED},       // center block (low)
     {{ 4, 1.0f,  0}, { 2, 2, 2},        ORANGE},    // right
     {{-4, 1.0f,  0}, { 2, 2, 2},        BLUE},      // left
-    {{ 0, 2.0f, -6}, {10, 0.5f, 2},     DARKGRAY},  // “wall” ahead
-    {{ 0, 0.0f,  0}, {50, 0.1f, 50},    LIGHTGRAY}  // a thin “ground”
+    {{ 0, 2.0f, -6}, {10, 0.5f, 2},     DARKGRAY},  // wall ahead
+    {{ 0, 0.0f,  0}, {50, 0.1f, 50},    LIGHTGRAY}  // ground plane
 };
-static const int levelBoxesCount = (int)(sizeof(levelBoxes)/sizeof(levelBoxes[0]));
+static const int level_boxes_count = (int)(sizeof(level_boxes)/sizeof(level_boxes[0]));
 
 static Config cfg = {0};
 static Camera camera = {0};
@@ -30,7 +30,7 @@ static bool load_config_toml(const char* path, Config* out) {
         char* eol = line; while (*eol && *eol != '\n' && *eol != '\r') ++eol;
         *eol = '\0';
         
-        // parse keys
+        // parse known keys
         if (strstr(line, "width"))      out->width      =        atoi(strchr(line, '=')+1);
         if (strstr(line, "height"))     out->height     =        atoi(strchr(line, '=')+1);
         if (strstr(line, "fov"))        out->fov        = (float)atof(strchr(line, '=')+1);
@@ -49,15 +49,15 @@ void core_create_window() {
 }
 
 i32 core_prepare() {
-    lstring cfgPath = "assets/config.toml";
-    if (load_config_toml(cfgPath, &cfg) == false){
-        swiss_log_error("failed to load config");
+    lstring cfg_path = "assets/config.toml";
+    if (load_config_toml(cfg_path, &cfg) == false){
+        swiss_log_error("failed to load game config");
         return 1;
     }
     
-    cfg.path = cfgPath;
+    cfg.path = cfg_path;
     cfg._next_check = 0.0;
-    cfg._last_mod = GetFileModTime(cfgPath);
+    cfg._last_mod = GetFileModTime(cfg_path);
 
     camera.position   = (Vector3){ 0.0f, 2.0f, 10.0f };     // Camera position
     camera.target     = (Vector3){ 0.0f, 0.0f, 0.0f };      // Camera looking at point
@@ -71,6 +71,7 @@ i32 core_prepare() {
 void core_loop() {
     UpdateCamera(&camera, CAMERA_FIRST_PERSON);
 
+    // TODO: config update should be in separate function
     double now = GetTime();
     if (now >= cfg._next_check) {
         cfg._next_check = now + 0.5;
@@ -91,14 +92,14 @@ void core_loop() {
         ClearBackground(RAYWHITE);
 
         BeginMode3D(camera);
-            for (int i = 0; i < levelBoxesCount; ++i) {
-                DrawCubeV(levelBoxes[i].pos, levelBoxes[i].size, levelBoxes[i].color);
-                DrawCubeWiresV(levelBoxes[i].pos, levelBoxes[i].size, levelBoxes[i].color);
+            for (int i = 0; i < level_boxes_count; ++i) {
+                DrawCubeV(level_boxes[i].pos, level_boxes[i].size, level_boxes[i].color);
+                DrawCubeWiresV(level_boxes[i].pos, level_boxes[i].size, level_boxes[i].color);
             }
             DrawGrid(100, 1.0f);
         EndMode3D();
         DrawFPS(10, 10);
-        DrawText(TextFormat("FOV: %.1f | FPS cap: %d | F1: toggle lock | F11: fullscreen", 
+        DrawText(TextFormat("FOV: %.1f | FPS cap: %d | F11: fullscreen", 
                 cfg.fov, cfg.target_fps), 10, 40, 20, DARKGRAY);
     EndDrawing();
 }
