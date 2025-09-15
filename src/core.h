@@ -24,10 +24,17 @@ typedef struct {
     i64 _last_mod;
 } Config;
 
-void core_create_window();
-i32  core_prepare();
-void core_loop();
-bool core_window_should_close();
-void core_close_window();
+typedef struct {
+    Config config;
+    Camera camera;
+} GameState;
+
+typedef void (*core_create_window_fn)();
+typedef i32  (*core_prepare_fn)();
+typedef void (*core_loop_fn)();
+typedef bool (*core_window_should_close_fn)();
+typedef void (*core_close_window_fn)();
+typedef GameState (*core_get_state_fn)();
+typedef void (*core_set_state_fn)(GameState);
 
 #endif /* CORE_H */

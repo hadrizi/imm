@@ -111,3 +111,17 @@ bool core_window_should_close() {
 void core_close_window() {
     CloseWindow();
 }
+
+GameState core_get_state() {
+    GameState state = {0};
+    state.config = cfg;
+    state.camera = camera;
+
+    return state;
+}
+
+void core_set_state(GameState state) {
+    cfg = state.config;
+    camera = state.camera;
+}
+
