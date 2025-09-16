@@ -10,7 +10,7 @@
 typedef struct BoxDef { Vector3 pos, size; Color color; } BoxDef;
 
 static const BoxDef level_boxes[] = {
-    {{ 0, 1.0f,  0}, { 1, 1, 1},        RED},       // center block (low)
+    {{ 0, 1.0f,  0}, { 1, 1, 1},        GREEN},       // center block (low)
     {{ 4, 1.0f,  0}, { 2, 2, 2},        ORANGE},    // right
     {{-4, 1.0f,  0}, { 2, 2, 2},        BLUE},      // left
     {{ 0, 2.0f, -6}, {10, 0.5f, 2},     DARKGRAY},  // wall ahead

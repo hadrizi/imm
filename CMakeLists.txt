@@ -10,9 +10,9 @@ file(GLOB SRC
   src/*.c src/*/*.c src/*/*/*.c
 )
 
-set(CORE_SRC src/core.c)
-set(GAME_SRC ${SRC})
-list(REMOVE_ITEM GAME_SRC ${CORE_SRC})
+set(CORE_SRC ${SRC})
+set(GAME_SRC src/main.c)
+list(REMOVE_ITEM CORE_SRC ${GAME_SRC})
 # =========================================
 
 # DEPENDENCIES ============================
@@ -24,9 +24,9 @@ target_include_directories(swiss_lib INTERFACE external/swiss)
 # =========================================
 
 # CORE SHARED LIB =========================
-add_library(core MODULE ${CORE_SRC} src/core.h)
+add_library(core MODULE ${CORE_SRC})
 set_target_properties(core PROPERTIES OUTPUT_NAME core_build)
-target_compile_definitions(core PRIVATE BUILD_LIBTYPE_SHARED SWISS_IMPL)
+target_compile_definitions(core PRIVATE BUILD_LIBTYPE_SHARED)
 target_include_directories(core PRIVATE src external/raylib/src external/swiss)
 target_link_libraries(core PUBLIC raylib swiss_lib)
 
